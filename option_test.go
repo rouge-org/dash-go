@@ -28,3 +28,18 @@ func TestOption(t *testing.T) {
 		t.Errorf("value does not match")
 	}
 }
+
+func TestOptionNil(t *testing.T) {
+	var (
+		o dash.Option[string]
+	)
+
+	if o.GetIsEmpty() != true {
+		t.Errorf("should be empty")
+	}
+
+	_, ok := o.Get()
+	if ok != false {
+		t.Errorf("ok should be false")
+	}
+}

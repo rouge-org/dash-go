@@ -21,6 +21,11 @@ func Some[T any](value T) *Option[T] {
 }
 
 func (o *Option[T]) Set(value T) *Option[T] {
+	if o.box == nil {
+		o.box = NewBox(Ref(value))
+		return o
+	}
+
 	o.box.Map(func(_ *T) *T {
 		return Ref(value)
 	})
@@ -37,6 +42,10 @@ func (o *Option[T]) Get() (value T, ok bool) {
 }
 
 func (o *Option[T]) GetIsPresent() (result bool) {
+	if o.box == nil {
+		return
+	}
+
 	o.box.Apply(func(inner *T) {
 		result = inner != nil
 	})
