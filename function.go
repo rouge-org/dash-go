@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type F func()
+type F = func()
 type FT[T any] func(T)
 type FU[U any] func() U
 type FTT[T any] func(T) T
@@ -38,7 +38,7 @@ type CanMapApply[T any] interface {
 	CanApply[T]
 }
 
-func Call(fn F) {
+func Call[TF ~F](fn TF) {
 	fn()
 }
 
@@ -48,13 +48,13 @@ func Sleep(duration time.Duration) F {
 	}
 }
 
-func Async(fn F) F {
+func Async[TF ~F](fn TF) F {
 	return func() {
 		go fn()
 	}
 }
 
-func Stack(fns ...F) F {
+func Stack[TF ~F](fns ...TF) F {
 	return func() {
 		for _, f := range fns {
 			Call(f)
@@ -62,15 +62,15 @@ func Stack(fns ...F) F {
 	}
 }
 
-func Callback(fn F, callback F) F {
+func Callback[TF ~F](fn TF, callback TF) F {
 	return Stack(fn, callback)
 }
 
-func Later(duration time.Duration, fn F) F {
+func Later[TF ~F](duration time.Duration, fn TF) F {
 	return Async(Callback(Sleep(duration), fn))
 }
 
-func Loop(ctx context.Context, fn F) F {
+func Loop[TF ~F](ctx context.Context, fn TF) F {
 	return func() {
 		for {
 			select {
@@ -86,11 +86,11 @@ func Loop(ctx context.Context, fn F) F {
 	}
 }
 
-func LoopAsync(ctx context.Context, fn F) F {
+func LoopAsync[TF ~F](ctx context.Context, fn TF) F {
 	return Async(Loop(ctx, fn))
 }
 
-func LoopTicker(duration time.Duration, ctx context.Context, fn F) F {
+func LoopTicker[TF ~F](duration time.Duration, ctx context.Context, fn TF) F {
 	return func() {
 		timer := time.NewTicker(duration)
 
@@ -108,6 +108,6 @@ func LoopTicker(duration time.Duration, ctx context.Context, fn F) F {
 	}
 }
 
-func LoopTickerAsync(duration time.Duration, ctx context.Context, fn F) F {
+func LoopTickerAsync[TF ~F](duration time.Duration, ctx context.Context, fn TF) F {
 	return Async(LoopTicker(duration, ctx, fn))
 }
