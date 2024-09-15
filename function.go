@@ -70,7 +70,24 @@ func Later(duration time.Duration, fn F) F {
 	return Async(Callback(Sleep(duration), fn))
 }
 
-func Loop(duration time.Duration, ctx context.Context, fn F) F {
+func Loop(ctx context.Context, fn F) F {
+	return func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			}
+
+			Call(fn)
+		}
+	}
+}
+
+func LoopAsync(ctx context.Context, fn F) F {
+	return Async(Loop(ctx, fn))
+}
+
+func LoopTicker(duration time.Duration, ctx context.Context, fn F) F {
 	return func() {
 		timer := time.NewTicker(duration)
 
@@ -88,6 +105,6 @@ func Loop(duration time.Duration, ctx context.Context, fn F) F {
 	}
 }
 
-func LoopAsync(duration time.Duration, ctx context.Context, fn F) F {
-	return Async(Loop(duration, ctx, fn))
+func LoopTickerAsync(duration time.Duration, ctx context.Context, fn F) F {
+	return Async(LoopTicker(duration, ctx, fn))
 }

@@ -40,7 +40,7 @@ func TestFunctionLoop(t *testing.T) {
 	ctx, cancel = context.WithCancel(context.Background())
 	it = 0
 
-	dash.Call(dash.LoopAsync(time.Millisecond, ctx, func() {
+	dash.Call(dash.LoopTickerAsync(time.Millisecond, ctx, func() {
 		dash.Incr(&it)
 	}))
 	time.Sleep(time.Second * 10)
