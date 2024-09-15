@@ -76,6 +76,9 @@ func Loop(ctx context.Context, fn F) F {
 			select {
 			case <-ctx.Done():
 				return
+
+			default:
+				break
 			}
 
 			Call(fn)
