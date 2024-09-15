@@ -16,14 +16,14 @@ func NewLocked[T any](value T) (l *Locked[T]) {
 	return
 }
 
-func (l *Locked[T]) Map(fn func(T) T) {
+func (l *Locked[T]) Map(fn FTT[T]) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
 	l.box.Map(fn)
 }
 
-func (l *Locked[T]) Apply(fn func(T)) {
+func (l *Locked[T]) Apply(fn FT[T]) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 

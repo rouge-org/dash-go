@@ -20,10 +20,10 @@ func (b *Box[T]) SetValue(value T) {
 	b.value = value
 }
 
-func (b *Box[T]) Map(fn func(T) T) {
+func (b *Box[T]) Map(fn FTT[T]) {
 	b.SetValue(fn(b.GetValue()))
 }
 
-func (b *Box[T]) Apply(fn func(T)) {
+func (b *Box[T]) Apply(fn FT[T]) {
 	fn(b.GetValue())
 }

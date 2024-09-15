@@ -12,6 +12,14 @@ func NewOption[T any]() (o *Option[T]) {
 	return
 }
 
+func NewOptionFromRef[T any](src *T) (o *Option[T]) {
+	if src == nil {
+		return None[T]()
+	}
+
+	return Some(Deref(src))
+}
+
 func None[T any]() *Option[T] {
 	return NewOption[T]()
 }
@@ -39,6 +47,32 @@ func (o *Option[T]) Get() (value T, ok bool) {
 	}
 
 	return Deref(o.box.GetValue()), true
+}
+
+func (o *Option[T]) GetOr(fallback T) (value T) {
+	var (
+		ok bool
+	)
+
+	value, ok = o.Get()
+	if !ok {
+		return fallback
+	}
+
+	return value
+}
+
+func (o *Option[T]) GetOrFrom(fallback FU[T]) (value T) {
+	var (
+		ok bool
+	)
+
+	value, ok = o.Get()
+	if !ok {
+		return fallback()
+	}
+
+	return value
 }
 
 func (o *Option[T]) GetIsPresent() (result bool) {
