@@ -64,14 +64,19 @@ func (q *Queue[T]) Consume(fn FTU[T, bool]) (count int) {
 			flag bool
 		)
 
-		flag = true
 		next = NewSlice[T]()
+		flag = true
 
 		for _, it := range curr {
 			if flag {
-				flag = fn(it)
-				count++
-			} else {
+				if fn(it) {
+					count++
+				} else {
+					flag = false
+				}
+			}
+
+			if !flag {
 				next = append(next, it)
 			}
 		}
