@@ -98,6 +98,24 @@ func (q *Queue[T]) Consume(fn FTU[T, bool]) (count int) {
 	return
 }
 
+func (q *Queue[T]) ConsumeAll(fn FTU[T, bool]) (count int) {
+	q.inner.Map(func(curr []T) (next []T) {
+		next = NewSlice[T]()
+
+		for _, it := range curr {
+			if fn(it) {
+				count++
+			} else {
+				next = append(next, it)
+			}
+		}
+
+		return
+	})
+
+	return
+}
+
 func (q *Queue[T]) ConsumeConcurrent(fn FTU[T, bool]) (count int) {
 	countConcurrent := NewLocked(0)
 
