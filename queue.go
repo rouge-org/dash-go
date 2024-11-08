@@ -58,6 +58,17 @@ func (q *Queue[T]) Get() (result *Option[T]) {
 	return
 }
 
+func (q *Queue[T]) GetAll() (result []T) {
+	result = make([]T, 0)
+
+	q.inner.Map(func(curr []T) (next []T) {
+		result = append(result, curr...)
+		return NewSlice[T]()
+	})
+
+	return
+}
+
 func (q *Queue[T]) Consume(fn FTU[T, bool]) (count int) {
 	q.inner.Map(func(curr []T) (next []T) {
 		var (
@@ -82,6 +93,28 @@ func (q *Queue[T]) Consume(fn FTU[T, bool]) (count int) {
 		}
 
 		return
+	})
+
+	return
+}
+
+func (q *Queue[T]) ConsumeConcurrent(fn FTU[T, bool]) (count int) {
+	countConcurrent := NewLocked(0)
+
+	q.inner.Map(func(curr []T) (next []T) {
+		nextConcurrent := NewQueueLocked[T]()
+
+		for _, it := range curr {
+			go func(item T) {
+				if fn(item) {
+					countConcurrent.Map(func(v int) int { return v + 1 })
+				} else {
+					nextConcurrent.Add(item)
+				}
+			}(it)
+		}
+
+		return nextConcurrent.GetAll()
 	})
 
 	return
