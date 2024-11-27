@@ -32,6 +32,14 @@ func (q *Queue[T]) GetIsNotEmpty() (result bool) {
 	return !q.GetIsEmpty()
 }
 
+func (q *Queue[T]) Size() (result int) {
+	q.inner.Apply(func(inner []T) {
+		result = len(inner)
+	})
+
+	return
+}
+
 func (q *Queue[T]) Add(value T) {
 	q.inner.Map(func(curr []T) []T {
 		return append(curr, value)
